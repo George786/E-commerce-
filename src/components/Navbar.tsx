@@ -45,6 +45,12 @@ export default function Navbar() {
           <button className="text-body text-dark-900 transition-colors hover:text-dark-700">
             My Cart (2)
           </button>
+            <Link
+                href="/sign-in"
+                className="text-body text-dark-900 transition-colors hover:text-dark-700"
+            >
+                Sign In
+            </Link>
         </div>
 
         <button
@@ -82,6 +88,13 @@ export default function Navbar() {
             <button className="text-body">My Cart (2)</button>
           </li>
         </ul>
+          <Link
+              href="/sign-in"
+              className="text-left text-body text-dark-900 hover:text-dark-700"
+              onClick={() => setOpen(false)}
+          >
+              Sign In
+          </Link>
       </div>
     </header>
   );
