@@ -86,15 +86,15 @@ export default function Navbar() {
           <li className="flex items-center justify-between pt-2">
             <button className="text-body">Search</button>
             <button className="text-body">My Cart (2)</button>
+              <Link
+                  href="/sign-in"
+                  className="text-left text-body text-dark-900 hover:text-dark-700"
+                  onClick={() => setOpen(false)}
+              >
+                  Sign In
+              </Link>
           </li>
         </ul>
-          <Link
-              href="/sign-in"
-              className="text-left text-body text-dark-900 hover:text-dark-700"
-              onClick={() => setOpen(false)}
-          >
-              Sign In
-          </Link>
       </div>
     </header>
   );
