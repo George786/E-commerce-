@@ -42,20 +42,7 @@ export type GetAllProductsResult = {
     totalCount: number;
 };
 
-export async function getAllProducts(filters: {
-    search: undefined;
-    genderSlugs: any[];
-    brandSlugs: any[];
-    categorySlugs: any[];
-    sizeSlugs: any[];
-    colorSlugs: any[];
-    priceMin: undefined;
-    priceMax: undefined;
-    priceRanges: any[];
-    sort: string;
-    page: number;
-    limit: number
-}): Promise<GetAllProductsResult> {
+export async function getAllProducts(filters: NormalizedProductFilters): Promise<GetAllProductsResult> {
     const conds: SQL[] = [eq(products.isPublished, true)];
 
     if (filters.search) {

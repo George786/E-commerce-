@@ -1,12 +1,12 @@
 import React from "react";
 import { Card } from "@/components";
-import { getAllProducts } from "@/lib/actions/product"; // ✅ import real product fetch function
+import { getAllProducts } from "@/lib/actions/product";
+import { NormalizedProductFilters } from "@/lib/utils/query";
 
 const Home = async () => {
-    // ✅ Define filters — adjust as needed
-    const filters = {
+    const filters: NormalizedProductFilters = {
         search: undefined,
-        genderSlugs: [],         // e.g., ['men'] for men's shoes only
+        genderSlugs: [],
         brandSlugs: [],
         categorySlugs: [],
         sizeSlugs: [],
@@ -16,10 +16,9 @@ const Home = async () => {
         priceRanges: [],
         sort: "newest",
         page: 1,
-        limit: 6,                // show 6 products
+        limit: 6,
     };
 
-    // ✅ Fetch real products
     const { products } = await getAllProducts(filters);
 
     return (
