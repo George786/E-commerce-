@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { guests } from "@/lib/db/schema/index";
 import { and, eq, lt } from "drizzle-orm";
 import { randomUUID } from "crypto";
+import { mergeGuestCart } from '@/lib/actions/cart'
 
 const COOKIE_OPTIONS = {
   httpOnly: true as const,
@@ -135,4 +136,50 @@ async function migrateGuestToUser() {
 
   await db.delete(guests).where(eq(guests.sessionToken, token));
   (await cookieStore).delete("guest_session");
+}
+
+
+
+// chatgpt code.....
+
+export interface GuestCartItem {
+    productVariantId: string
+    quantity: number
+}
+
+/**
+ * Load guest cart from cookies by session ID
+ */
+export async function getGuestCart(guestSessionId: string): Promise<GuestCartItem[]> {
+    const cookieStore = await cookies()
+    const cartCookie = cookieStore.get(`guest_cart_${guestSessionId}`)?.value
+
+    if (!cartCookie) return []
+
+    try {
+        const guestCart: GuestCartItem[] = JSON.parse(cartCookie)
+        // Optional: validate structure
+        if (!Array.isArray(guestCart)) return []
+        return guestCart.map(item => ({
+            productVariantId: String(item.productVariantId),
+            quantity: Number(item.quantity),
+        }))
+    } catch (err) {
+        console.error('Failed to parse guest cart cookie', err)
+        return []
+    }
+}
+
+
+
+
+
+export async function onSuccessfulLogin(userId: string) {
+    const cookieStore = await cookies()
+    const guestSessionId = cookieStore.get('guest_session')?.value
+    if (guestSessionId) {
+        const guestCart = await getGuestCart(guestSessionId)
+        await mergeGuestCart(guestCart)
+        cookieStore.delete('guest_session')
+    }
 }
