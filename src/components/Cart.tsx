@@ -15,7 +15,7 @@ export default function Cart() {
                 {items.map((item) => (
                     <li key={item.productVariantId} className="flex justify-between border-b py-2">
                         <div>
-                            <p>{item.name}</p>
+                            <p>{item.title}</p>
                             <p className="text-sm">Qty: {item.quantity}</p>
                         </div>
                         <div>

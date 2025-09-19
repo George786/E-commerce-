@@ -1,49 +1,92 @@
-'use client';
+'use client'
 
-import { create } from 'zustand';
+import { create } from 'zustand'
+import { devtools } from 'zustand/middleware'
 
-// Cart item type
-export type CartItem = {
-    productId: string;
-    productVariantId: string;
-    quantity: number;
-    title: string;   // use title consistently
-    price: number;
-};
+export interface CartItem {
+    productId: string
+    productVariantId: string
+    title: string
+    price: number
+    quantity: number
+}
 
-// Cart store type
-type CartState = {
-    items: CartItem[];
-    addItem: (item: CartItem) => void;
-    removeItem: (variantId: string) => void;
-    clear: () => void;
-};
+interface CartState {
+    items: CartItem[]
+    setItems: (items: CartItem[]) => void
+    addItem: (item: CartItem) => void
+    removeItem: (productVariantId: string) => void
+    updateItem: (productVariantId: string, quantity: number) => void
+    clear: () => void
+    fetchCart: () => Promise<void>
+}
 
-// Zustand cart store
-export const useCartStore = create<CartState>((set) => ({
-    items: [],
-    addItem: (item) =>
-        set((state) => {
-            // Check if item with same variant exists
-            const existing = state.items.find(
-                (i) => i.productVariantId === item.productVariantId
-            );
-            if (existing) {
-                // Increase quantity
-                return {
-                    items: state.items.map((i) =>
-                        i.productVariantId === item.productVariantId
-                            ? { ...i, quantity: i.quantity + item.quantity }
-                            : i
-                    ),
-                };
+export const useCartStore = create<CartState>()(
+    devtools((set, get) => ({
+        items: [],
+        setItems: (items) => set({ items }),
+
+        fetchCart: async () => {
+            try {
+                const res = await fetch('/api/cart')
+                const data = await res.json()
+                if (data.success) set({ items: data.cart?.items ?? [] })
+            } catch (err) {
+                console.error('Failed to fetch cart', err)
             }
-            // Add new item
-            return { items: [...state.items, item] };
-        }),
-    removeItem: (variantId) =>
-        set((state) => ({
-            items: state.items.filter((i) => i.productVariantId !== variantId),
-        })),
-    clear: () => set({ items: [] }),
-}));
+        },
+
+        addItem: async (item) => {
+            try {
+                const res = await fetch('/api/cart', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        productVariantId: item.productVariantId,
+                        quantity: item.quantity,
+                    }),
+                })
+                const data = await res.json()
+                if (data.success) set({ items: data.cart?.items ?? get().items })
+            } catch (err) {
+                console.error('Failed to add item', err)
+            }
+        },
+
+        removeItem: async (productVariantId) => {
+            try {
+                const res = await fetch(`/api/cart?id=${productVariantId}`, {
+                    method: 'DELETE',
+                })
+                const data = await res.json()
+                if (data.success) set({ items: data.cart?.items ?? get().items })
+            } catch (err) {
+                console.error('Failed to remove item', err)
+            }
+        },
+
+        updateItem: async (productVariantId, quantity) => {
+            try {
+                const res = await fetch('/api/cart', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: productVariantId, quantity }),
+                })
+                const data = await res.json()
+                if (data.success) set({ items: data.cart?.items ?? get().items })
+            } catch (err) {
+                console.error('Failed to update item', err)
+            }
+        },
+
+        clear: async () => {
+            try {
+                const res = await fetch('/api/cart?action=clear', { method: 'DELETE' })
+                const data = await res.json()
+                if (data.success) set({ items: [] })
+            } catch (err) {
+                console.error('Failed to clear cart', err)
+            }
+        },
+    }))
+)
