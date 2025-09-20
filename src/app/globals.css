@@ -2,20 +2,35 @@
 
 @theme {
   /* Dark shades */
-  --color-dark-900: #111111;
-  --color-dark-700: #757575;
-  --color-dark-500: #aaaaaa;
+  --color-dark-900: #0a0a0a;
+  --color-dark-800: #1a1a1a;
+  --color-dark-700: #404040;
+  --color-dark-600: #525252;
+  --color-dark-500: #737373;
 
   /* Light shades */
   --color-light-100: #ffffff;
-  --color-light-200: #f5f5f5;
-  --color-light-300: #e5e5e5;
-  --color-light-400: #cccccc;
+  --color-light-200: #fafafa;
+  --color-light-300: #f4f4f5;
+  --color-light-400: #e4e4e7;
+  --color-light-500: #d4d4d8;
 
   /* Supporting colors */
-  --color-green: #007d48;
-  --color-red: #d33918;
-  --color-orange: #d37918;
+  --color-green: #10b981;
+  --color-green-light: #34d399;
+  --color-red: #ef4444;
+  --color-red-light: #f87171;
+  --color-orange: #f59e0b;
+  --color-orange-light: #fbbf24;
+  --color-blue: #3b82f6;
+  --color-blue-light: #60a5fa;
+  --color-purple: #8b5cf6;
+  --color-purple-light: #a78bfa;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 
   /* Font family */
   --font-jost: "Jost", sans-serif;
@@ -56,4 +71,151 @@
   --text-footnote: 12px;
   --text-footnote--line-height: 18px;
   --text-footnote--font-weight: 400;
+}
+
+/* Modern CSS utilities */
+@layer utilities {
+  .glass-effect {
+    @apply bg-white/80 backdrop-blur-md border border-white/20;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent;
+  }
+  
+  .shadow-glow {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+  }
+  
+  .shadow-glow-green {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+  }
+  
+  .shadow-glow-red {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .animate-bounce-slow {
+    animation: bounce 2s infinite;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-light-200);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-dark-500);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-dark-700);
+}
+
+/* Focus styles */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+/* Button hover effects */
+.btn-hover {
+  @apply transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg;
+}
+
+/* Card hover effects */
+.card-hover {
+  @apply transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl;
+}
+
+/* Loading animation */
+.loading-dots {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.loading-dots div {
+  position: absolute;
+  top: 33px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--color-blue);
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+
+.loading-dots div:nth-child(1) {
+  left: 8px;
+  animation: loading-dots1 0.6s infinite;
+}
+
+.loading-dots div:nth-child(2) {
+  left: 8px;
+  animation: loading-dots2 0.6s infinite;
+}
+
+.loading-dots div:nth-child(3) {
+  left: 32px;
+  animation: loading-dots2 0.6s infinite;
+}
+
+.loading-dots div:nth-child(4) {
+  left: 56px;
+  animation: loading-dots3 0.6s infinite;
+}
+
+@keyframes loading-dots1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes loading-dots3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+
+@keyframes loading-dots2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(24px, 0);
+  }
 }

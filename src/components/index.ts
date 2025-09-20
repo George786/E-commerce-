@@ -11,3 +11,5 @@ export { default as CartSummary } from "./CartSummary";
 export { default as EmptyCart } from "./EmptyCart";
 export { default as AddToCartButton } from "./AddToCartButton";
 export { default as ProductSelection } from "./ProductSelection";
+export { default as OrderSuccess } from "./OrderSuccess";
+export { default as FavoriteButton } from "./FavoriteButton";

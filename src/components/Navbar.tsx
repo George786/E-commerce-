@@ -26,7 +26,7 @@ export default function Navbar() {
     const totalItems = items.reduce((sum, i) => sum + i.quantity, 0)
 
     return (
-        <header className="sticky top-0 z-50 bg-light-100">
+        <header className="sticky top-0 z-50 glass-effect border-b border-light-300">
             <nav
                 className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
                 aria-label="Primary"
@@ -49,26 +49,26 @@ export default function Navbar() {
                 </ul>
 
                 <div className="hidden items-center gap-6 md:flex">
-                    <button className="text-body text-dark-900 transition-colors hover:text-dark-700">
+                    <button className="btn-hover text-body text-dark-900 transition-all duration-200 hover:text-blue-600 focus-ring rounded-lg px-3 py-2">
                         Search
                     </button>
 
                     <Link
                         href="/cart"
-                        className="relative flex items-center gap-2 text-body text-dark-900 transition-colors hover:text-dark-700"
+                        className="btn-hover relative flex items-center gap-2 text-body text-dark-900 transition-all duration-200 hover:text-blue-600 focus-ring rounded-lg px-3 py-2"
                     >
                         <ShoppingBag className="h-5 w-5" />
                         Cart
                         {totalItems > 0 && (
-                            <span className="absolute -top-2 -right-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
-                {totalItems}
-              </span>
+                            <span className="absolute -top-2 -right-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-red-600 text-xs font-bold text-white shadow-lg animate-bounce-slow">
+                                {totalItems}
+                            </span>
                         )}
                     </Link>
 
                     <Link
                         href="/sign-in"
-                        className="text-body text-dark-900 transition-colors hover:text-dark-700"
+                        className="btn-hover text-body text-dark-900 transition-all duration-200 hover:text-blue-600 focus-ring rounded-lg px-3 py-2"
                     >
                         Sign In
                     </Link>

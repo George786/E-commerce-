@@ -2,8 +2,9 @@
 
 import { useCartStore } from '@/store/cart.store'
 import { getCurrentUser } from '@/lib/auth/actions'
-import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { redirectToCheckout } from '@/lib/actions/checkout'
+import { CreditCard, Loader2 } from 'lucide-react'
 
 interface CartSummaryProps {
 	className?: string
@@ -11,8 +12,8 @@ interface CartSummaryProps {
 
 export default function CartSummary({ className = '' }: CartSummaryProps) {
 	const { items, clear, isLoading } = useCartStore()
-	const router = useRouter()
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
+	const [isCheckoutLoading, setIsCheckoutLoading] = useState(false)
 
 	useEffect(() => {
 		// Check if user is authenticated
@@ -32,13 +33,22 @@ export default function CartSummary({ className = '' }: CartSummaryProps) {
 	const tax = subtotal * 0.08 // 8% tax
 	const total = subtotal + shipping + tax
 
-	const handleCheckout = () => {
-		if (!isAuthenticated) {
-			// Redirect to auth page for guest users
-			router.push('/sign-in?redirect=/checkout')
-		} else {
-			// Proceed to checkout for authenticated users
-			router.push('/checkout')
+	const handleCheckout = async () => {
+		if (items.length === 0) {
+			alert('Your cart is empty')
+			return
+		}
+
+		setIsCheckoutLoading(true)
+		
+		try {
+			// Redirect to Stripe checkout
+			await redirectToCheckout()
+		} catch (error) {
+			console.error('Checkout error:', error)
+			alert('Failed to start checkout. Please try again.')
+		} finally {
+			setIsCheckoutLoading(false)
 		}
 	}
 
@@ -89,10 +99,20 @@ export default function CartSummary({ className = '' }: CartSummaryProps) {
 			<div className="mt-6 space-y-3">
 				<button
 					onClick={handleCheckout}
-					disabled={isLoading}
+					disabled={isLoading || isCheckoutLoading}
 					className="w-full rounded-full bg-dark-900 px-6 py-4 text-body-medium text-light-100 transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[--color-dark-500] disabled:opacity-50 disabled:cursor-not-allowed"
 				>
-					{isAuthenticated ? 'Proceed to Checkout' : 'Sign In to Checkout'}
+					{isCheckoutLoading ? (
+						<>
+							<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+							Processing...
+						</>
+					) : (
+						<>
+							<CreditCard className="mr-2 h-4 w-4" />
+							Proceed to Checkout
+						</>
+					)}
 				</button>
 				
 				<button
@@ -104,13 +124,14 @@ export default function CartSummary({ className = '' }: CartSummaryProps) {
 				</button>
 			</div>
 
-			{!isAuthenticated && (
-				<div className="mt-4 rounded-lg bg-blue-50 p-4">
-					<p className="text-caption text-blue-800">
-						Sign in to save your cart and get free shipping on orders over $100.
-					</p>
-				</div>
-			)}
+			<div className="mt-4 rounded-lg bg-green-50 p-4">
+				<p className="text-caption text-green-800">
+					{isAuthenticated 
+						? 'Secure checkout powered by Stripe. Your payment information is encrypted and secure.'
+						: 'Guest checkout available. Sign in to save your cart and get free shipping on orders over $100.'
+					}
+				</p>
+			</div>
 		</div>
 	)
 }

@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Heart } from 'lucide-react'
 import AddToCartButton from './AddToCartButton'
+import FavoriteButton from './FavoriteButton'
 
 interface Variant {
 	id: string
@@ -137,10 +137,13 @@ export default function ProductSelection({
 					disabled={!isSelectionComplete}
 				/>
 
-				<button className="flex items-center justify-center gap-2 rounded-full border border-light-300 px-6 py-4 text-body-medium text-dark-900 transition hover:border-dark-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-[--color-dark-500]">
-					<Heart className="h-5 w-5" />
-					Favorite
-				</button>
+				<FavoriteButton
+					productId={productId}
+					productName={productName}
+					showText={true}
+					size="md"
+					className="w-full"
+				/>
 			</div>
 
 		</div>

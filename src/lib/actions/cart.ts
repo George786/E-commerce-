@@ -93,7 +93,7 @@ export async function addCartItem({
                 userId: userId,
                 guestId: null
             }).returning()
-            cart = { ...newCart, items: [] }
+        cart = { ...newCart, items: [] }
         } else {
             // For guests, we'll use a simple approach without database constraints
             throw new Error('Guest cart functionality requires database setup')
