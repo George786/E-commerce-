@@ -13,3 +13,6 @@ export { default as AddToCartButton } from "./AddToCartButton";
 export { default as ProductSelection } from "./ProductSelection";
 export { default as OrderSuccess } from "./OrderSuccess";
 export { default as FavoriteButton } from "./FavoriteButton";
+export { default as SearchBar } from "./SearchBar";
+export { default as ShippingForm } from "./ShippingForm";
+export { default as PaymentForm } from "./PaymentForm";

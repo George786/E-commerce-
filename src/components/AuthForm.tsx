@@ -54,10 +54,16 @@ export default function AuthForm({ mode, onSubmitAction }: Props) {
             {/* Error/Success Messages */}
             {error && (
                 <div className="rounded-lg bg-red-50 border border-red-200 p-4">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 mb-3">
                         <AlertCircle className="h-5 w-5 text-red-600" />
                         <p className="text-body text-red-800">{error}</p>
                     </div>
+                    <button
+                        onClick={() => window.location.href = '/'}
+                        className="text-body-medium text-red-700 hover:text-red-800 underline"
+                    >
+                        ← Back to Home Page
+                    </button>
                 </div>
             )}
 

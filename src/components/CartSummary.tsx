@@ -39,6 +39,13 @@ export default function CartSummary({ className = '' }: CartSummaryProps) {
 			return
 		}
 
+		// Check if user is authenticated
+		if (!isAuthenticated) {
+			alert('Please sign in to proceed with checkout')
+			window.location.href = '/sign-in?redirect=' + encodeURIComponent('/cart')
+			return
+		}
+
 		setIsCheckoutLoading(true)
 		
 		try {
@@ -124,11 +131,11 @@ export default function CartSummary({ className = '' }: CartSummaryProps) {
 				</button>
 			</div>
 
-			<div className="mt-4 rounded-lg bg-green-50 p-4">
-				<p className="text-caption text-green-800">
+			<div className="mt-4 rounded-lg bg-blue-50 p-4">
+				<p className="text-caption text-blue-800">
 					{isAuthenticated 
 						? 'Secure checkout powered by Stripe. Your payment information is encrypted and secure.'
-						: 'Guest checkout available. Sign in to save your cart and get free shipping on orders over $100.'
+						: 'Please sign in to proceed with checkout. Create an account to save your cart and get free shipping on orders over $100.'
 					}
 				</p>
 			</div>

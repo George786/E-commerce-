@@ -24,12 +24,14 @@ export const auth = betterAuth({
       google: {
         clientId: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        allowDangerousEmailAccountLinking: true, // Allow auto signup
       },
     }),
     ...(process.env.APPLE_CLIENT_ID && process.env.APPLE_CLIENT_SECRET && {
       apple: {
         clientId: process.env.APPLE_CLIENT_ID,
         clientSecret: process.env.APPLE_CLIENT_SECRET,
+        allowDangerousEmailAccountLinking: true, // Allow auto signup
       },
     }),
   },

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useCartStore } from '@/store/cart.store'
 import { ShoppingBag } from 'lucide-react'
+import SearchBar from './SearchBar'
 
 const NAV_LINKS = [
     { label: 'Men', href: '/products?gender=men' },
@@ -49,9 +50,7 @@ export default function Navbar() {
                 </ul>
 
                 <div className="hidden items-center gap-6 md:flex">
-                    <button className="btn-hover text-body text-dark-900 transition-all duration-200 hover:text-blue-600 focus-ring rounded-lg px-3 py-2">
-                        Search
-                    </button>
+                    <SearchBar className="w-64" />
 
                     <Link
                         href="/cart"

@@ -9,10 +9,10 @@ import EmptyCart from '@/components/EmptyCart'
 export default function CartPage() {
 	const { items, fetchCart, isLoading, error } = useCartStore()
 
-	// Fetch cart from backend on page load
-	useEffect(() => {
-		fetchCart()
-	}, [fetchCart])
+    // Fetch cart from backend on page load
+    useEffect(() => {
+        fetchCart()
+    }, [fetchCart])
 
 	if (isLoading && items.length === 0) {
 		return (
@@ -28,18 +28,18 @@ export default function CartPage() {
 	}
 
 	if (error) {
-		return (
+    return (
 			<main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 				<div className="flex items-center justify-center py-16">
 					<div className="text-center">
 						<p className="text-body text-red-600 mb-4">{error}</p>
-						<button
+                            <button
 							onClick={() => fetchCart()}
 							className="rounded-full bg-dark-900 px-6 py-3 text-body-medium text-light-100 transition hover:opacity-90"
-						>
+                            >
 							Try Again
-						</button>
-					</div>
+                            </button>
+                        </div>
 				</div>
 			</main>
 		)
@@ -73,8 +73,8 @@ export default function CartPage() {
 				{/* Order Summary */}
 				<div className="lg:sticky lg:top-8">
 					<CartSummary />
-				</div>
-			</div>
+                </div>
+            </div>
 		</main>
-	)
+    )
 }

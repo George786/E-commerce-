@@ -39,7 +39,9 @@ export default async function ProductsPage({
     return (
         <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <header className="flex items-center justify-between py-6">
-                <h1 className="text-heading-3 text-dark-900">New ({totalCount})</h1>
+                <h1 className="text-heading-3 text-dark-900">
+                    {parsed.search ? `Search Results for "${parsed.search}" (${totalCount})` : `New (${totalCount})`}
+                </h1>
                 <Sort />
             </header>
 
