@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { db } from "@/lib/db";
-import { carts, cartItems } from "@/lib/db/schema";
-import { eq, and } from "drizzle-orm";
 
 // ✅ GET: fetch cart
 export async function GET() {
@@ -56,99 +54,26 @@ export async function POST(req: NextRequest) {
 
         if (!cartId) {
             // create a new cart if none exists
-            console.log('Creating new cart...');
-            try {
                 const [newCart] = await db
                     .insert(carts)
-                    .values({ 
-                        userId: null,
-                        guestId: null 
-                    })
-                    .returning();
-                
-                if (!newCart) {
-                    console.error('Failed to create cart - no cart returned');
-                    throw new Error('Failed to create cart');
-                }
-                
                 cartId = newCart.id;
-                console.log('Created cart with ID:', cartId);
-
-                // Verify the cart was actually created
-                const verifyCart = await db.query.carts.findFirst({
-                    where: eq(carts.id, cartId)
-                });
-                
-                if (!verifyCart) {
-                    console.error('Cart creation verification failed - cart not found in database');
-                    throw new Error('Cart creation verification failed');
-                }
-                
-                console.log('Cart creation verified successfully');
 
                 cookieStore.set("cartId", cartId, {
                     httpOnly: true,
                     path: "/",
                     maxAge: 60 * 60 * 24 * 7, // 1 week
                 });
-            } catch (cartError) {
-                console.error('Error creating cart:', cartError);
-                throw cartError;
-            }
-        } else {
-            console.log('Using existing cart ID:', cartId);
         }
 
-        // Verify cart exists, if not create a new one
-        let cartExists = await db.query.carts.findFirst({
-            where: eq(carts.id, cartId)
-        });
-        
-        if (!cartExists) {
-            console.error('Cart not found:', cartId, '- creating new cart');
-            // Clear the invalid cart ID from cookies
-            cookieStore.delete("cartId");
-            
-            // Create a new cart
-            const [newCart] = await db
-                .insert(carts)
-                .values({ 
-                    userId: null,
-                    guestId: null 
-                })
-                .returning();
-            
-            if (!newCart) {
-                throw new Error('Failed to create new cart');
-            }
-            
-            cartId = newCart.id;
-            console.log('Created new cart with ID:', cartId);
-
-            // Set the new cart ID in cookies
-            cookieStore.set("cartId", cartId, {
-                httpOnly: true,
-                path: "/",
-                maxAge: 60 * 60 * 24 * 7, // 1 week
-            });
-        }
-
-        // upsert logic - check if item already exists in this cart
         const existingItem = await db.query.cartItems.findFirst({
-            where: and(
-                eq(cartItems.cartId, cartId),
-                eq(cartItems.productVariantId, productVariantId)
-            ),
         });
 
         if (existingItem) {
-            console.log('Updating existing item:', existingItem.id);
             await db
                 .update(cartItems)
                 .set({ quantity: existingItem.quantity + quantity })
                 .where(eq(cartItems.id, existingItem.id));
         } else {
-            console.log('Inserting new cart item for cart:', cartId, 'product:', productVariantId);
             await db.insert(cartItems).values({
                 cartId,
                 productVariantId,
@@ -156,7 +81,6 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        console.log('Successfully added item to cart');
         return NextResponse.json({ success: true });
     } catch (err: unknown) {
         console.error("Cart POST error:", err);

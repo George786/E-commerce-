@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { ShoppingBag } from 'lucide-react'
-import { useCartStore } from '@/store/cart.store'
 
 export default function HeaderCartButton() {
     const { items } = useCartStore()

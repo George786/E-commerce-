@@ -7,7 +7,6 @@ import { db } from "@/lib/db"
 import { guests } from "@/lib/db/schema/index"
 import { and, eq, lt } from "drizzle-orm"
 import { randomUUID } from "crypto"
-// import { mergeGuestCart } from "@/lib/actions/cart" // Not used for now
 
 const COOKIE_OPTIONS = {
     httpOnly: true as const,
@@ -103,14 +102,10 @@ export async function signOut() {
 // ==================== Guest Cart ====================
 
 export interface GuestCartItem {
-    id: string
     productVariantId: string
     quantity: number
-    product?: unknown
-    variant?: unknown
 }
 
-// Guest cart functionality moved to use existing API routes
 
 /**
  * Migrate guest cart to user cart after login/signup
@@ -121,14 +116,7 @@ async function migrateGuestToUser(userId?: string) {
     const guestSessionId = cookieStore.get("guest_session")?.value
     if (!guestSessionId) return
 
-    try {
-        // For now, just clear the guest session
-        // Cart merging can be implemented later when database is properly set up
         cookieStore.delete("guest_session")
-    } catch (error) {
-        console.error('Failed to migrate guest cart:', error)
-        // Don't throw error to prevent login failure
-    }
 }
 
 /**
