@@ -1,4 +1,5 @@
 'use client'
+import { useCartStore } from '@/store/cart.store'
 
 export default function Cart() {
     const { items, removeItem, clear } = useCartStore()
@@ -12,6 +13,7 @@ export default function Cart() {
             <h1 className="mb-4 text-2xl font-bold">Your Cart</h1>
             <ul>
                 {items.map((item) => (
+                    <li key={item.id} className="flex justify-between border-b py-2">
                         <div>
                             <p>{item.title}</p>
                             <p className="text-sm">Qty: {item.quantity}</p>
@@ -19,6 +21,7 @@ export default function Cart() {
                         <div>
                             <p>${item.price * item.quantity}</p>
                             <button
+                                onClick={() => removeItem(item.id)}
                                 className="text-red-500 text-sm"
                             >
                                 Remove
@@ -33,6 +36,7 @@ export default function Cart() {
                 </button>
                 <p className="font-bold">
                     Total: $
+                    {items.reduce((sum, i) => sum + i.price * i.quantity, 0).toFixed(2)}
                 </p>
             </div>
         </div>

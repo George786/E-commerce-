@@ -11,8 +11,8 @@ interface Variant {
 	salePrice?: string | null
 	colorId: string
 	sizeId: string
-	color?: { name: string }
-	size?: { name: string }
+	color?: { name: string } | null
+	size?: { name: string } | null
 }
 
 interface ProductSelectionProps {
@@ -110,11 +110,12 @@ export default function ProductSelection({
 							<button
 								key={size}
 								onClick={() => setSelectedSize(size)}
+								disabled={!selectedColor}
 								className={`rounded-lg border px-3 py-3 text-center text-body transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[--color-dark-500] ${
 									selectedSize === size
 										? 'border-dark-900 text-dark-900'
 										: 'border-light-300 text-dark-700 hover:border-dark-500'
-								}`}
+								} ${!selectedColor ? 'opacity-50 cursor-not-allowed' : ''}`}
 							>
 								{size}
 							</button>
@@ -142,18 +143,6 @@ export default function ProductSelection({
 				</button>
 			</div>
 
-			{/* Selection Status */}
-			{!isSelectionComplete && (
-				<div className="rounded-lg bg-blue-50 p-4">
-					<p className="text-caption text-blue-800">
-						{!selectedColor && !selectedSize
-							? 'Please select a color and size to add to cart'
-							: !selectedColor
-							? 'Please select a color'
-							: 'Please select a size'}
-					</p>
-				</div>
-			)}
 		</div>
 	)
 }

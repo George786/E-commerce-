@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { Heart, Star } from "lucide-react";
-import ColorSwatches from "@/components/ColorSwatches";
+import { Card, CollapsibleSection, ProductGallery, ProductSelection } from "@/components";
+import { Star } from "lucide-react";
 import { getProduct, getProductReviews, getRecommendedProducts, type Review, type RecommendedProduct } from "@/lib/actions/product";
-import AddToCartButton from "@/components/AddToCartButton";
+
 
 type GalleryVariant = { color: string; images: string[] };
 
@@ -179,7 +179,11 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                         )}
                     </div>
 
+                    <ProductSelection
                         productId={product.id}
+                        productName={product.name}
+                        variants={variants}
+                        defaultPrice={displayPrice ?? 0}
                     />
 
 

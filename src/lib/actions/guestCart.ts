@@ -2,6 +2,7 @@
 
 import { db } from '@/lib/db'
 import { carts, cartItems } from '@/lib/db/schema/carts'
+import { eq } from 'drizzle-orm'
 
 export async function getGuestCart(guestId: string) {
     return db.query.carts.findFirst({
