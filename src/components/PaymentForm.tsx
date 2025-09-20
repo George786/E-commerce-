@@ -142,11 +142,26 @@ export default function PaymentForm({
   const handlePayment = async () => {
     setIsProcessing(true)
     
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 3000))
-    
-    setIsProcessing(false)
-    onComplete()
+    try {
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 3000))
+      
+      // In a real app, you would integrate with your payment provider here
+      // For demo purposes, we'll simulate a successful payment
+      console.log('Payment processed successfully:', {
+        method: selectedPayment,
+        amount: calculateFinalTotal(),
+        coupon: appliedCoupon?.code,
+        giftCard: giftCardAmount > 0 ? giftCardCode : null
+      })
+      
+      setIsProcessing(false)
+      onComplete()
+    } catch (error) {
+      console.error('Payment processing error:', error)
+      alert('Payment failed. Please try again.')
+      setIsProcessing(false)
+    }
   }
 
   return (

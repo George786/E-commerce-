@@ -2,6 +2,7 @@ import React from "react";
 import { Card } from "@/components";
 import { getAllProducts } from "@/lib/actions/product";
 import { NormalizedProductFilters } from "@/lib/utils/query";
+import { formatUSD } from "@/lib/utils/currency";
 import Image from "next/image";
 
 const Home = async () => {
@@ -45,7 +46,7 @@ const Home = async () => {
                             title={p.name}
                             subtitle={p.subtitle || ""}
                             imageSrc={p.imageUrl || "/fallback-image.jpg"}
-                            price={p.minPrice !== null ? p.minPrice.toFixed(2) : undefined}
+                            price={p.minPrice !== null ? formatUSD(p.minPrice) : undefined}
                             href={`/products/${p.id}`}
                         />
                     ))}

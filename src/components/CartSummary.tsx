@@ -3,7 +3,6 @@
 import { useCartStore } from '@/store/cart.store'
 import { getCurrentUser } from '@/lib/auth/actions'
 import { useEffect, useState } from 'react'
-import { redirectToCheckout } from '@/lib/actions/checkout'
 import { CreditCard, Loader2 } from 'lucide-react'
 
 interface CartSummaryProps {
@@ -49,8 +48,8 @@ export default function CartSummary({ className = '' }: CartSummaryProps) {
 		setIsCheckoutLoading(true)
 		
 		try {
-			// Redirect to Stripe checkout
-			await redirectToCheckout()
+			// Redirect to our custom checkout page instead of Stripe directly
+			window.location.href = '/checkout'
 		} catch (error) {
 			console.error('Checkout error:', error)
 			alert('Failed to start checkout. Please try again.')

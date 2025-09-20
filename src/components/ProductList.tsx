@@ -1,6 +1,7 @@
 "use client";
 
 import Card from "@/components/Card";
+import { formatUSD } from "@/lib/utils/currency";
 
 interface Product {
     id: string;
@@ -27,9 +28,9 @@ export default function ProductList({ products }: { products: Product[] }) {
                     p.minPrice !== null &&
                     p.maxPrice !== null &&
                     p.minPrice !== p.maxPrice
-                        ? `$${p.minPrice.toFixed(2)} - $${p.maxPrice.toFixed(2)}`
+                        ? `${formatUSD(p.minPrice)} - ${formatUSD(p.maxPrice)}`
                         : p.minPrice !== null
-                            ? `$${p.minPrice.toFixed(2)}`
+                            ? formatUSD(p.minPrice)
                             : undefined;
 
                 return (
