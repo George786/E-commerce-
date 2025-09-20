@@ -5,6 +5,7 @@ import { Star } from "lucide-react";
 import { getProduct, getProductReviews, getRecommendedProducts, type Review, type RecommendedProduct } from "@/lib/actions/product";
 
 
+
 type GalleryVariant = { color: string; images: string[] };
 
 function formatPrice(price: number | null | undefined) {
