@@ -3,6 +3,7 @@ import Sort from "@/components/Sort";
 import { parseFilterParams } from "@/lib/utils/query";
 import { getAllProducts } from "@/lib/actions/product";
 import ProductList from "@/components/ProductList";
+export const dynamic = 'force-dynamic'
 
 type SearchParams = Record<string, string | string[] | undefined>;
 

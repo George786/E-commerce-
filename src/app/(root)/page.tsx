@@ -1,4 +1,5 @@
 import React from "react";
+export const dynamic = 'force-dynamic'
 import { Card } from "@/components";
 import { getAllProducts } from "@/lib/actions/product";
 import { NormalizedProductFilters } from "@/lib/utils/query";

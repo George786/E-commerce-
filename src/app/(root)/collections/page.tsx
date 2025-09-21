@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+export const dynamic = 'force-dynamic'
 import { Metadata } from 'next'
 import { db } from '@/lib/db'
 import Link from 'next/link'
