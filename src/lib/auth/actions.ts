@@ -136,6 +136,9 @@ export async function signOut() {
 
 export async function signInWithGoogle() {
     try {
+        if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+            return { ok: false, error: "Google provider not configured" }
+        }
         const res = await auth.api.signInSocial({
             body: {
                 provider: "google",
@@ -156,6 +159,9 @@ export async function signInWithGoogle() {
 
 export async function signInWithApple() {
     try {
+        if (!process.env.APPLE_CLIENT_ID || !process.env.APPLE_CLIENT_SECRET) {
+            return { ok: false, error: "Apple provider not configured" }
+        }
         const res = await auth.api.signInSocial({
             body: {
                 provider: "apple",

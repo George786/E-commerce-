@@ -19,9 +19,11 @@ export default function SocialProviders({ variant = "sign-in" }: Props) {
         window.location.href = result.url;
       } else {
         console.error('Google sign in failed:', result?.error);
+        alert(result?.error || 'Google sign in is not configured.');
       }
     } catch (error) {
       console.error('Google sign in error:', error);
+      alert('Google sign in failed. Please try again later.');
     } finally {
       setIsGoogleLoading(false);
     }
@@ -35,9 +37,11 @@ export default function SocialProviders({ variant = "sign-in" }: Props) {
         window.location.href = result.url;
       } else {
         console.error('Apple sign in failed:', result?.error);
+        alert(result?.error || 'Apple sign in is not configured.');
       }
     } catch (error) {
       console.error('Apple sign in error:', error);
+      alert('Apple sign in failed. Please try again later.');
     } finally {
       setIsAppleLoading(false);
     }
