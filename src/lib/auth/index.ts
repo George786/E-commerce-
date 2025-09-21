@@ -37,9 +37,9 @@ export const auth = betterAuth({
   },
   sessions: {
     cookieCache: {
-      enabled: false,
-      maxAge: 0,
-    },
+      enabled: true,
+      maxAge: 60 * 60 * 24 * 7
+    }
   },
   cookies: {
     sessionToken: {
@@ -47,7 +47,7 @@ export const auth = betterAuth({
       options: {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: 'lax',
+        sameSite: 'strict',
         path: '/',
         maxAge: 60 * 60 * 24 * 7,
       }

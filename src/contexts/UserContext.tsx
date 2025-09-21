@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
+import { getCurrentUser } from '@/lib/auth/actions'
 import { signOut } from '@/lib/auth/actions'
 import { useRouter } from 'next/navigation'
 
@@ -27,17 +28,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
 	const refreshUser = async () => {
 		try {
-			const res = await fetch('/api/auth/session', {
-				method: 'GET',
-				credentials: 'include',
-				cache: 'no-store',
-			})
-			if (!res.ok) {
-				setUser(null)
-				return
-			}
-			const data = await res.json()
-			setUser(data?.user ?? null)
+			const currentUser = await getCurrentUser()
+			setUser(currentUser)
 		} catch {
 			setUser(null)
 		} finally {
@@ -47,14 +39,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
 	const logout = async () => {
 		try {
-			// Call Better Auth REST endpoint(s) directly so Set-Cookie clears in the browser
-			await fetch('/api/auth/sign-out', { method: 'POST', credentials: 'include' }).catch(() => {})
-			await fetch('/sign-out', { method: 'POST', credentials: 'include' }).catch(() => {})
-			// Fallback to server action in case the endpoint is unreachable
 			await signOut()
 			setUser(null)
-			router.replace('/')
-			router.refresh()
+			router.push('/')
 		} catch (error) {
 			console.error('Error logging out:', error)
 		}

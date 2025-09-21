@@ -127,12 +127,7 @@ export async function getCurrentUser() {
 
 export async function signOut() {
     try {
-        const h = await headers()
-        await auth.api.signOut({ headers: h })
-        const cookieStore = await cookies()
-        // Explicitly clear session-related cookies
-        cookieStore.delete('auth_session')
-        cookieStore.delete('guest_session')
+        await auth.api.signOut({ headers: {} })
         return { ok: true }
     } catch {
         // Silently handle sign out errors
@@ -142,9 +137,6 @@ export async function signOut() {
 
 export async function signInWithGoogle() {
     try {
-        if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-            return { ok: false, error: "Google provider not configured" }
-        }
         const res = await auth.api.signInSocial({
             body: {
                 provider: "google",
@@ -165,9 +157,6 @@ export async function signInWithGoogle() {
 
 export async function signInWithApple() {
     try {
-        if (!process.env.APPLE_CLIENT_ID || !process.env.APPLE_CLIENT_SECRET) {
-            return { ok: false, error: "Apple provider not configured" }
-        }
         const res = await auth.api.signInSocial({
             body: {
                 provider: "apple",
