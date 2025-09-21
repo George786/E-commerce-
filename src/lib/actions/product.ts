@@ -43,6 +43,10 @@ export type GetAllProductsResult = {
 };
 
 export async function getAllProducts(filters: NormalizedProductFilters): Promise<GetAllProductsResult> {
+    if (!process.env.DATABASE_URL) {
+        return { products: [], totalCount: 0 }
+    }
+    try {
     const conds: SQL[] = [eq(products.isPublished, true)];
 
     if (filters.search) {
@@ -209,6 +213,10 @@ export async function getAllProducts(filters: NormalizedProductFilters): Promise
     const totalCount = countRows[0]?.cnt ?? 0;
 
     return { products: productsOut, totalCount };
+    } catch (error) {
+        console.error('getAllProducts error:', error)
+        return { products: [], totalCount: 0 }
+    }
 }
 
 export type FullProduct = {
