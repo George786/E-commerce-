@@ -126,7 +126,12 @@ export async function getCurrentUser() {
 
 export async function signOut() {
     try {
-        await auth.api.signOut({ headers: {} })
+        const h = await headers()
+        await auth.api.signOut({ headers: h })
+        const cookieStore = await cookies()
+        // Explicitly clear session-related cookies
+        cookieStore.delete('auth_session')
+        cookieStore.delete('guest_session')
         return { ok: true }
     } catch {
         // Silently handle sign out errors

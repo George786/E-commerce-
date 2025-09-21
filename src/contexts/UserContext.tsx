@@ -43,6 +43,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 			await signOut()
 			setUser(null)
 			router.push('/')
+			// Ensure client state is refreshed post-redirect to avoid stale session
+			router.refresh()
 		} catch (error) {
 			console.error('Error logging out:', error)
 		}
