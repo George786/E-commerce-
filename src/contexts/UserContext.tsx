@@ -40,10 +40,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
 	const logout = async () => {
 		try {
+			// Call Better Auth REST endpoint(s) directly so Set-Cookie clears in the browser
+			await fetch('/api/auth/sign-out', { method: 'POST', credentials: 'include' }).catch(() => {})
+			await fetch('/sign-out', { method: 'POST', credentials: 'include' }).catch(() => {})
+			// Fallback to server action in case the endpoint is unreachable
 			await signOut()
 			setUser(null)
-			router.push('/')
-			// Ensure client state is refreshed post-redirect to avoid stale session
+			router.replace('/')
 			router.refresh()
 		} catch (error) {
 			console.error('Error logging out:', error)
