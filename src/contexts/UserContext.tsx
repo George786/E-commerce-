@@ -1,7 +1,6 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { getCurrentUser } from '@/lib/auth/actions'
 import { signOut } from '@/lib/auth/actions'
 import { useRouter } from 'next/navigation'
 
@@ -28,10 +27,18 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
 	const refreshUser = async () => {
 		try {
-			const currentUser = await getCurrentUser()
-			setUser(currentUser)
+			const res = await fetch('/api/auth/session', {
+				method: 'GET',
+				credentials: 'include',
+				cache: 'no-store',
+			})
+			if (!res.ok) {
+				setUser(null)
+				return
+			}
+			const data = await res.json()
+			setUser(data?.user ?? null)
 		} catch {
-			// Silently handle session errors - user is not logged in
 			setUser(null)
 		} finally {
 			setIsLoading(false)

@@ -116,7 +116,8 @@ export async function signIn(formData: FormData) {
 
 export async function getCurrentUser() {
     try {
-        const session = await auth.api.getSession({ headers: await headers() })
+        const h = await headers()
+        const session = await auth.api.getSession({ headers: h })
         return session?.user ?? null
     } catch {
         // Silently handle auth errors - user is not logged in
