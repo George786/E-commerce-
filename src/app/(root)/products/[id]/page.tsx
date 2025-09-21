@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { Card, CollapsibleSection, ProductGallery, ProductSelection } from "@/components";
+import ProductOffers from "@/components/ProductOffers";
 import { Star } from "lucide-react";
 import { getProduct, getProductReviews, getRecommendedProducts, type Review, type RecommendedProduct } from "@/lib/actions/product";
 
@@ -187,6 +188,9 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                         defaultPrice={displayPrice ?? 0}
                     />
 
+                    <div className="mt-6">
+                        <ProductOffers />
+                    </div>
 
                     <CollapsibleSection title="Product Details" defaultOpen>
                         <p>{product.description}</p>

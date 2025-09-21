@@ -53,6 +53,13 @@ export const useCartStore = create<CartState>()(
 					try {
 						// Use the existing API route for now
 						const response = await fetch('/api/cart')
+						
+						if (!response.ok) {
+							// If cart API fails, just set empty cart
+							set({ items: [], cartId: null, guestSessionId: null })
+							return
+						}
+						
 						const data = await response.json()
 						
 						if (data.success && data.cart) {
@@ -77,9 +84,9 @@ export const useCartStore = create<CartState>()(
 						} else {
 							set({ items: [], cartId: null, guestSessionId: null })
 						}
-					} catch (error) {
-						console.error('Failed to fetch cart:', error)
-						setError('Failed to load cart')
+					} catch {
+						// Silently handle cart fetch errors - user might not be logged in
+						set({ items: [], cartId: null, guestSessionId: null })
 					} finally {
 						setLoading(false)
 					}
@@ -106,34 +113,6 @@ export const useCartStore = create<CartState>()(
 						if (!response.ok) {
 							const errorData = await response.json().catch(() => ({}))
 							console.error('API Error:', errorData)
-							
-							// If cart not found, clear the cart state and try again
-							if (response.status === 404 && errorData.error === 'Cart not found') {
-								console.log('Cart not found, clearing cart state and retrying...')
-								set({ items: [], cartId: null, guestSessionId: null })
-								
-								// Retry the request once
-								const retryResponse = await fetch('/api/cart', {
-									method: 'POST',
-									headers: {
-										'Content-Type': 'application/json',
-									},
-									body: JSON.stringify({
-										productVariantId: item.productVariantId,
-										quantity: item.quantity || 1,
-									}),
-								})
-								
-								if (!retryResponse.ok) {
-									const retryErrorData = await retryResponse.json().catch(() => ({}))
-									throw new Error(retryErrorData.error || 'Failed to add item to cart')
-								}
-								
-								// If retry succeeded, refresh cart and return
-								await fetchCart()
-								return
-							}
-							
 							throw new Error(errorData.error || 'Failed to add item to cart')
 						}
 

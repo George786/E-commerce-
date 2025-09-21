@@ -6,6 +6,7 @@ import { getCurrentUser } from '@/lib/auth/actions'
 import { useCartStore } from '@/store/cart.store'
 import ShippingForm from '@/components/ShippingForm'
 import PaymentForm from '@/components/PaymentForm'
+import LocationPermission from '@/components/LocationPermission'
 import { CheckCircle, ShoppingBag, MapPin, CreditCard } from 'lucide-react'
 
 type CheckoutStep = 'shipping' | 'payment' | 'complete'
@@ -154,10 +155,20 @@ export default function CheckoutPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {currentStep === 'shipping' && (
-          <ShippingForm
-            onNext={handleShippingNext}
-            onBack={() => router.push('/cart')}
-          />
+          <div className="space-y-6">
+            <LocationPermission 
+              onLocationGranted={(location) => {
+                console.log('Location granted:', location)
+              }}
+              onLocationDenied={() => {
+                console.log('Location denied')
+              }}
+            />
+            <ShippingForm
+              onNext={handleShippingNext}
+              onBack={() => router.push('/cart')}
+            />
+          </div>
         )}
 
         {currentStep === 'payment' && (

@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
+import { ArrowLeft, Home } from "lucide-react";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -26,7 +28,26 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </section>
 
       <section className="flex items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
-        <div className="w-full max-w-md">{children}</div>
+        <div className="w-full max-w-md">
+          {/* Navigation buttons */}
+          <div className="mb-6 flex gap-3">
+            <Link
+              href="/"
+              className="btn-hover flex items-center gap-2 rounded-lg border border-light-300 bg-light-100 px-3 py-2 text-body text-dark-900 hover:bg-light-200 focus-ring"
+            >
+              <Home className="h-4 w-4" />
+              Home
+            </Link>
+            <button
+              onClick={() => window.history.back()}
+              className="btn-hover flex items-center gap-2 rounded-lg border border-light-300 bg-light-100 px-3 py-2 text-body text-dark-900 hover:bg-light-200 focus-ring"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </button>
+          </div>
+          {children}
+        </div>
       </section>
     </main>
   );

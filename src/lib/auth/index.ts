@@ -58,5 +58,7 @@ export const auth = betterAuth({
       generateId: () => uuidv4()
     }
   },
-  plugins: [nextCookies()]
+  plugins: [nextCookies()],
+  // Add error handling
+  trustedOrigins: process.env.NODE_ENV === "production" ? [] : ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"]
 });

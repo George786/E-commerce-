@@ -118,15 +118,20 @@ export async function getCurrentUser() {
     try {
         const session = await auth.api.getSession({ headers: await headers() })
         return session?.user ?? null
-    } catch (e) {
-        console.error(e)
+    } catch {
+        // Silently handle auth errors - user is not logged in
         return null
     }
 }
 
 export async function signOut() {
-    await auth.api.signOut({ headers: {} })
-    return { ok: true }
+    try {
+        await auth.api.signOut({ headers: {} })
+        return { ok: true }
+    } catch {
+        // Silently handle sign out errors
+        return { ok: true }
+    }
 }
 
 export async function signInWithGoogle() {

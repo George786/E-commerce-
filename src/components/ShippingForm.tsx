@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { MapPin, User, Phone, Mail, Home } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { MapPin, User, Phone, Mail, Home, Loader2 } from 'lucide-react'
+import { autoFillLocation, isValidPincode } from '@/lib/utils/pincode'
 
 interface ShippingAddress {
   firstName: string
@@ -35,6 +36,7 @@ export default function ShippingForm({ onNext, onBack, className = '' }: Shippin
   })
 
   const [errors, setErrors] = useState<Partial<ShippingAddress>>({})
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -51,6 +53,33 @@ export default function ShippingForm({ onNext, onBack, className = '' }: Shippin
       }))
     }
   }
+
+  // Auto-fill location when ZIP code changes
+  useEffect(() => {
+    const handleZipCodeChange = async () => {
+      if (formData.zipCode && isValidPincode(formData.zipCode)) {
+        setIsLoadingLocation(true)
+        
+        // Simulate API delay
+        setTimeout(() => {
+          const locationData = autoFillLocation(formData.zipCode)
+          
+          if (locationData) {
+            setFormData(prev => ({
+              ...prev,
+              city: locationData.city || prev.city,
+              state: locationData.state || prev.state,
+              country: locationData.country || prev.country,
+            }))
+          }
+          
+          setIsLoadingLocation(false)
+        }, 500)
+      }
+    }
+
+    handleZipCodeChange()
+  }, [formData.zipCode])
 
   const validateForm = (): boolean => {
     const newErrors: Partial<ShippingAddress> = {}
@@ -242,6 +271,9 @@ export default function ShippingForm({ onNext, onBack, className = '' }: Shippin
           <div>
             <label htmlFor="zipCode" className="block text-body-medium font-medium text-dark-900 mb-2">
               ZIP Code *
+              {isLoadingLocation && (
+                <Loader2 className="inline h-4 w-4 ml-2 animate-spin text-blue-500" />
+              )}
             </label>
             <input
               type="text"
@@ -254,9 +286,12 @@ export default function ShippingForm({ onNext, onBack, className = '' }: Shippin
                   ? 'border-red-500 focus:ring-red-500/20' 
                   : 'border-light-300 focus:border-blue-500 focus:ring-blue-500/20'
               }`}
-              placeholder="ZIP Code"
+              placeholder="Enter ZIP code (auto-fills city & state)"
             />
             {errors.zipCode && <p className="text-caption text-red-600 mt-1">{errors.zipCode}</p>}
+            {isLoadingLocation && (
+              <p className="text-caption text-blue-600 mt-1">Looking up location...</p>
+            )}
           </div>
         </div>
 

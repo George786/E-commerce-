@@ -156,7 +156,9 @@ export async function getAllProducts(filters: NormalizedProductFilters): Promise
             ? asc(sql`min(${variantJoin.price})`)
             : filters.sort === "price_desc"
                 ? desc(sql`max(${variantJoin.price})`)
-                : desc(products.createdAt);
+                : filters.sort === "featured"
+                    ? desc(products.createdAt) // For featured, we'll use newest as default
+                    : desc(products.createdAt); // newest
 
     const page = Math.max(1, filters.page);
     const limit = Math.max(1, Math.min(filters.limit, 60));

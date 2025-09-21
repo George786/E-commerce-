@@ -126,7 +126,9 @@ async function seed() {
     log('Creating products with variants and images');
     for (let i = 0; i < productNames.length; i++) {
       const name = productNames[i];
-      const gender = allGenders[randInt(0, allGenders.length - 1)];
+      // Ensure better gender distribution: 5 men, 5 women, 5 unisex
+      const genderIndex = i < 5 ? 0 : i < 10 ? 1 : 2; // men, women, unisex
+      const gender = allGenders[genderIndex];
       const catPick = [shoesCat, runningCat, lifestyleCat][randInt(0, 2)];
       const desc = `Experience comfort and performance with ${name}.`;
 

@@ -4,8 +4,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useCartStore } from '@/store/cart.store'
-import { ShoppingBag } from 'lucide-react'
+import { ShoppingBag, User, LogOut } from 'lucide-react'
 import SearchBar from './SearchBar'
+import { useUser } from '@/contexts/UserContext'
 
 const NAV_LINKS = [
     { label: 'Men', href: '/products?gender=men' },
@@ -18,6 +19,7 @@ const NAV_LINKS = [
 export default function Navbar() {
     const [open, setOpen] = useState(false)
     const { items, fetchCart } = useCartStore()
+    const { user, isLoading, logout } = useUser()
 
     // Fetch cart on mount
     useEffect(() => {
@@ -65,12 +67,30 @@ export default function Navbar() {
                         )}
                     </Link>
 
-                    <Link
-                        href="/sign-in"
-                        className="btn-hover text-body text-dark-900 transition-all duration-200 hover:text-blue-600 focus-ring rounded-lg px-3 py-2"
-                    >
-                        Sign In
-                    </Link>
+                    {isLoading ? (
+                        <div className="h-8 w-8 animate-pulse rounded-full bg-light-200"></div>
+                    ) : user ? (
+                        <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 text-body text-dark-900">
+                                <User className="h-5 w-5" />
+                                <span className="hidden sm:inline">{user.name}</span>
+                            </div>
+                            <button
+                                onClick={logout}
+                                className="btn-hover flex items-center gap-2 text-body text-dark-900 transition-all duration-200 hover:text-red-600 focus-ring rounded-lg px-3 py-2"
+                            >
+                                <LogOut className="h-5 w-5" />
+                                <span className="hidden sm:inline">Logout</span>
+                            </button>
+                        </div>
+                    ) : (
+                        <Link
+                            href="/sign-in"
+                            className="btn-hover text-body text-dark-900 transition-all duration-200 hover:text-blue-600 focus-ring rounded-lg px-3 py-2"
+                        >
+                            Sign In
+                        </Link>
+                    )}
                 </div>
 
                 {/* Mobile Menu Button */}
@@ -113,13 +133,34 @@ export default function Navbar() {
                 </span>
                             )}
                         </Link>
-                        <Link
-                            href="/sign-in"
-                            className="text-left text-body text-dark-900 hover:text-dark-700"
-                            onClick={() => setOpen(false)}
-                        >
-                            Sign In
-                        </Link>
+                        {isLoading ? (
+                            <div className="h-6 w-16 animate-pulse rounded bg-light-200"></div>
+                        ) : user ? (
+                            <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1 text-body text-dark-900">
+                                    <User className="h-4 w-4" />
+                                    <span>{user.name}</span>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        logout()
+                                        setOpen(false)
+                                    }}
+                                    className="flex items-center gap-1 text-body text-dark-900 hover:text-red-600"
+                                >
+                                    <LogOut className="h-4 w-4" />
+                                    <span>Logout</span>
+                                </button>
+                            </div>
+                        ) : (
+                            <Link
+                                href="/sign-in"
+                                className="text-left text-body text-dark-900 hover:text-dark-700"
+                                onClick={() => setOpen(false)}
+                            >
+                                Sign In
+                            </Link>
+                        )}
                     </li>
                 </ul>
             </div>
