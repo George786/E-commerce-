@@ -6,6 +6,8 @@ import { formatUSD } from "@/lib/utils/currency";
 import OffersSection from "@/components/OffersSection";
 import Image from "next/image";
 
+export const dynamic = 'force-dynamic'
+
 const Home = async () => {
     const filters: NormalizedProductFilters = {
         search: undefined,

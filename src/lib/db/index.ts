@@ -12,5 +12,9 @@ if (!process.env.DATABASE_URL) {
   console.warn('DATABASE_URL not found. Database operations may fail.');
 }
 
-const sql = neon(process.env.DATABASE_URL || 'postgresql://localhost:5432/fallback');
-export const db = drizzle(sql, { schema });
+// Use a valid-format fallback string to avoid build-time errors when env is missing
+const connectionString = process.env.DATABASE_URL
+  ?? 'postgresql://user:password@localhost:5432/fallback'
+
+const sql = neon(connectionString)
+export const db = drizzle(sql, { schema })
