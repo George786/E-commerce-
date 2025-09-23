@@ -126,7 +126,7 @@ export async function getCurrentUser() {
 
 export async function signOut() {
     try {
-        await auth.api.signOut({ headers: {} })
+        await auth.api.signOut({ headers: await headers() })
         return { ok: true }
     } catch {
         // Silently handle sign out errors
