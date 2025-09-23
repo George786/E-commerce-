@@ -1,3 +1,4 @@
+// Implement reset password functionality with email verification
 import { requestPasswordReset } from '@/lib/auth/actions'
 
 type Props = {
