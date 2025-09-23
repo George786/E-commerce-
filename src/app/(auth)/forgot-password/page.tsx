@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 export default function Page() {
     async function action(formData: FormData) {
         'use server'
-        return await requestPasswordReset(formData)
+        await requestPasswordReset(formData)
     }
 
     return (
