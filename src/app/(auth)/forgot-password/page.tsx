@@ -6,7 +6,7 @@ type Props = {
 
 export const dynamic = 'force-dynamic'
 
-function FormInner({ sent }: { sent: boolean }) {
+function FormInner({ sent, error }: { sent: boolean; error: string | null }) {
     async function action(formData: FormData) {
         'use server'
         await requestPasswordReset(formData)
@@ -17,6 +17,16 @@ function FormInner({ sent }: { sent: boolean }) {
             {sent && (
                 <div className="rounded-lg bg-green-50 border border-green-200 p-4 mb-4">
                     <p className="text-body text-green-800">If an account exists, we've sent reset instructions.</p>
+                </div>
+            )}
+            {error === 'not-registered' && (
+                <div className="rounded-lg bg-red-50 border border-red-200 p-4 mb-4">
+                    <p className="text-body text-red-800">This email is not registered. Please try again with a correct email.</p>
+                </div>
+            )}
+            {error && error !== 'not-registered' && (
+                <div className="rounded-lg bg-red-50 border border-red-200 p-4 mb-4">
+                    <p className="text-body text-red-800">We couldn't process your request. Please try again.</p>
                 </div>
             )}
             <form action={action} className="space-y-6">
@@ -52,6 +62,8 @@ export default async function Page({ searchParams }: Props) {
     const params = (await searchParams) || {}
     const raw = params.sent
     const sent = Array.isArray(raw) ? raw[0] === '1' : raw === '1'
-    return <FormInner sent={Boolean(sent)} />
+    const errRaw = params.error
+    const error = Array.isArray(errRaw) ? errRaw[0] : (errRaw as string | undefined) || null
+    return <FormInner sent={Boolean(sent)} error={error} />
 }
 

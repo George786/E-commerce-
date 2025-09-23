@@ -139,7 +139,7 @@ export async function requestPasswordReset(formData: FormData) {
         // Look up user; if not found, exit generically
         const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1)
         const user = existing?.[0]
-        if (!user) return redirect('/forgot-password?sent=1')
+        if (!user) return redirect('/forgot-password?error=not-registered')
 
         // Create a reset token (stored hash/value depending on how verification is used)
         const token = randomUUID()
@@ -201,7 +201,10 @@ export async function requestPasswordReset(formData: FormData) {
 
         return redirect('/forgot-password?sent=1')
     } catch (error) {
-        return redirect('/forgot-password?sent=1')
+        if (error instanceof z.ZodError) {
+            return redirect('/forgot-password?error=invalid-input')
+        }
+        return redirect('/forgot-password?error=server')
     }
 }
 
