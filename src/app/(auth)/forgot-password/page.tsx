@@ -37,9 +37,11 @@ function FormInner({ sent }: { sent: boolean }) {
                 </div>
                 <button
                     type="submit"
-                    className="w-full rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 text-body-medium font-semibold text-white shadow-lg btn-hover"
+                    disabled={sent}
+                    aria-disabled={sent}
+                    className="w-full rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 text-body-medium font-semibold text-white shadow-lg btn-hover disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                    Send reset link
+                    {sent ? 'Reset link sent' : 'Send reset link'}
                 </button>
             </form>
         </>
