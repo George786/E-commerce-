@@ -1,13 +1,12 @@
 import { requestPasswordReset } from '@/lib/auth/actions'
-import { Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+
+type Props = {
+    searchParams?: { [key: string]: string | string[] | undefined }
+}
 
 export const dynamic = 'force-dynamic'
 
-function FormInner() {
-    const search = useSearchParams()
-    const sent = search.get('sent') === '1'
-
+function FormInner({ sent }: { sent: boolean }) {
     async function action(formData: FormData) {
         'use server'
         await requestPasswordReset(formData)
@@ -47,11 +46,8 @@ function FormInner() {
     )
 }
 
-export default function Page() {
-    return (
-        <Suspense>
-            <FormInner />
-        </Suspense>
-    )
+export default function Page({ searchParams }: Props) {
+    const sent = searchParams?.sent === '1'
+    return <FormInner sent={Boolean(sent)} />
 }
 

@@ -1,11 +1,10 @@
 import { resetPassword } from '@/lib/auth/actions'
-import { Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
 
-function ResetForm() {
-    const search = useSearchParams()
-    const token = search.get('token') || ''
-    const email = search.get('email') || ''
+type Props = {
+    searchParams?: { [key: string]: string | string[] | undefined }
+}
+
+function ResetForm({ token, email }: { token: string; email: string }) {
 
     async function action(formData: FormData) {
         'use server'
@@ -46,11 +45,9 @@ function ResetForm() {
     )
 }
 
-export default function Page() {
-    return (
-        <Suspense>
-            <ResetForm />
-        </Suspense>
-    )
+export default function Page({ searchParams }: Props) {
+    const token = (searchParams?.token as string) || ''
+    const email = (searchParams?.email as string) || ''
+    return <ResetForm token={token} email={email} />
 }
 
