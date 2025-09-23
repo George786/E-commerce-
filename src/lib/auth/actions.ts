@@ -156,25 +156,47 @@ export async function requestPasswordReset(formData: FormData) {
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
         const resetUrl = `${baseUrl}/reset-password?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`
 
-        // Send email via SMTP if configured; otherwise log
+        // Send email via SMTP if configured; otherwise fall back to Ethereal
         if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-            const transporter = nodemailer.createTransport({
-                host: process.env.SMTP_HOST,
-                port: Number(process.env.SMTP_PORT || 587),
-                secure: Boolean(process.env.SMTP_SECURE === 'true'),
-                auth: {
-                    user: process.env.SMTP_USER,
-                    pass: process.env.SMTP_PASS,
-                },
-            })
+            try {
+                const transporter = nodemailer.createTransport({
+                    host: process.env.SMTP_HOST,
+                    port: Number(process.env.SMTP_PORT || 587),
+                    secure: Boolean(process.env.SMTP_SECURE === 'true'),
+                    auth: {
+                        user: process.env.SMTP_USER,
+                        pass: process.env.SMTP_PASS,
+                    },
+                })
 
-            await transporter.sendMail({
-                from: process.env.MAIL_FROM || process.env.SMTP_USER,
-                to: email,
-                subject: 'Reset your password',
-                html: `<p>Click the link below to reset your password (valid for 30 minutes):</p>
+                await transporter.sendMail({
+                    from: process.env.MAIL_FROM || process.env.SMTP_USER,
+                    to: email,
+                    subject: 'Reset your password',
+                    html: `<p>Click the link below to reset your password (valid for 30 minutes):</p>
 <p><a href="${resetUrl}">${resetUrl}</a></p>`,
-            })
+                })
+            } catch (sendErr) {
+                console.error('SMTP send failed, falling back to Ethereal:', sendErr)
+                const testAccount = await nodemailer.createTestAccount()
+                const transporter = nodemailer.createTransport({
+                    host: 'smtp.ethereal.email',
+                    port: 587,
+                    secure: false,
+                    auth: {
+                        user: testAccount.user,
+                        pass: testAccount.pass,
+                    },
+                })
+                const info = await transporter.sendMail({
+                    from: 'no-reply@example.com',
+                    to: email,
+                    subject: 'Reset your password',
+                    html: `<p>Click the link below to reset your password (valid for 30 minutes):</p>
+<p><a href="${resetUrl}">${resetUrl}</a></p>`,
+                })
+                console.log('Ethereal preview URL:', (nodemailer as any).getTestMessageUrl?.(info))
+            }
         } else {
             // Fallback to Ethereal test account for local dev
             const testAccount = await nodemailer.createTestAccount()
@@ -194,8 +216,6 @@ export async function requestPasswordReset(formData: FormData) {
                 html: `<p>Click the link below to reset your password (valid for 30 minutes):</p>
 <p><a href="${resetUrl}">${resetUrl}</a></p>`,
             })
-            // Preview URL (open in browser to see the email)
-            // eslint-disable-next-line no-console
             console.log('Ethereal preview URL:', (nodemailer as any).getTestMessageUrl?.(info))
         }
 
