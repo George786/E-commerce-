@@ -58,12 +58,19 @@ export default function AuthForm({ mode, onSubmitAction }: Props) {
                         <AlertCircle className="h-5 w-5 text-red-600" />
                         <p className="text-body text-red-800">{error}</p>
                     </div>
-                    <button
-                        onClick={() => window.location.href = '/'}
-                        className="text-body-medium text-red-700 hover:text-red-800 underline"
-                    >
-                        ← Back to Home Page
-                    </button>
+                    <div className="flex items-center gap-4">
+                        {mode === 'sign-in' && (
+                            <Link href="/forgot-password" className="text-body-medium text-blue-700 hover:text-blue-800 underline">
+                                Forgot password?
+                            </Link>
+                        )}
+                        <button
+                            onClick={() => window.location.href = '/'}
+                            className="text-body-medium text-red-700 hover:text-red-800 underline"
+                        >
+                            ← Back to Home Page
+                        </button>
+                    </div>
                 </div>
             )}
 
@@ -142,10 +149,12 @@ export default function AuthForm({ mode, onSubmitAction }: Props) {
                             id="password"
                             name="password"
                             type={show ? "text" : "password"}
-                            placeholder="minimum 8 characters"
+                            placeholder={mode === 'sign-in' ? 'enter your password' : 'min 12 chars, upper, lower, number, symbol'}
                             className="w-full rounded-xl border border-light-300 bg-light-100 px-4 py-3 pr-12 text-body text-dark-900 placeholder:text-dark-500 focus-ring transition-all duration-200 hover:border-blue-400"
                             autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
-                            minLength={8}
+                            minLength={mode === 'sign-in' ? 1 : 12}
+                            pattern={mode === 'sign-in' ? undefined : '(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{12,}'}
+                            title={mode === 'sign-in' ? undefined : 'Use at least 12 characters with upper, lower, number, and symbol'}
                             required
                         />
                         <button
@@ -157,6 +166,19 @@ export default function AuthForm({ mode, onSubmitAction }: Props) {
                             {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
                     </div>
+                    {mode === 'sign-up' && (
+                        <p className="text-caption text-dark-600 mt-1">
+                            Use at least 12 characters including uppercase, lowercase, a number, and a symbol.
+                        </p>
+                    )}
+                </div>
+
+                <div className="flex items-center justify-between">
+                    {mode === 'sign-in' && (
+                        <Link href="/forgot-password" className="text-body text-blue-600 hover:text-blue-700 underline">
+                            Forgot password?
+                        </Link>
+                    )}
                 </div>
 
                 <button

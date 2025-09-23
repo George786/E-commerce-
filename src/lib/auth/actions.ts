@@ -18,7 +18,19 @@ const COOKIE_OPTIONS = {
 }
 
 const emailSchema = z.string().email()
-const passwordSchema = z.string().min(8).max(128)
+// Strong password for sign-up: 12+ chars, upper, lower, number, symbol
+const passwordSignUpSchema = z
+    .string()
+    .min(12, { message: "Password must be at least 12 characters long" })
+    .max(128, { message: "Password must be at most 128 characters long" })
+    .refine((value: string) => /[a-z]/.test(value), { message: "Include at least one lowercase letter" })
+    .refine((value: string) => /[A-Z]/.test(value), { message: "Include at least one uppercase letter" })
+    .refine((value: string) => /\d/.test(value), { message: "Include at least one number" })
+    .refine((value: string) => /[^A-Za-z0-9]/.test(value), { message: "Include at least one symbol" })
+
+// Looser check for sign-in: any non-empty string
+const passwordSignInSchema = z.string().min(1, { message: "Password is required" })
+
 const nameSchema = z.string().min(1).max(100)
 
 export async function createGuestSession() {
@@ -47,7 +59,7 @@ export async function guestSession() {
 
 const signUpSchema = z.object({
     email: emailSchema,
-    password: passwordSchema,
+    password: passwordSignUpSchema,
     name: nameSchema,
 })
 
@@ -84,7 +96,7 @@ export async function signUp(formData: FormData) {
 
 const signInSchema = z.object({
     email: emailSchema,
-    password: passwordSchema,
+    password: passwordSignInSchema,
 })
 
 export async function signIn(formData: FormData) {
@@ -111,6 +123,26 @@ export async function signIn(formData: FormData) {
         }
         
         return { ok: false, error: "Invalid email or password. Please check your credentials and try again." }
+    }
+}
+
+export async function requestPasswordReset(formData: FormData) {
+    try {
+        const rawData = {
+            email: formData.get("email") as string,
+        }
+
+        const { email } = z.object({ email: emailSchema }).parse(rawData)
+
+        // TODO: Integrate with auth provider's reset API when available
+        // For now, respond generically to avoid account enumeration
+        return { ok: true, message: "If an account exists, a reset link will be sent." }
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            const fieldErrors = error.issues.map(err => err.message).join(", ")
+            return { ok: false, error: `Please check your input: ${fieldErrors}` }
+        }
+        return { ok: true, message: "If an account exists, a reset link will be sent." }
     }
 }
 
