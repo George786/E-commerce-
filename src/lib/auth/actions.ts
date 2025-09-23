@@ -129,85 +129,60 @@ export async function signIn(formData: FormData) {
 }
 
 export async function requestPasswordReset(formData: FormData) {
+    // Validate input first
+    const rawData = { email: formData.get('email') as string }
+    let email: string
     try {
-        const rawData = {
-            email: formData.get("email") as string,
-        }
+        email = z.object({ email: emailSchema }).parse(rawData).email
+    } catch {
+        return redirect('/forgot-password?error=invalid-input')
+    }
 
-        const { email } = z.object({ email: emailSchema }).parse(rawData)
+    // Ensure user exists
+    const existing = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.email, email))
+        .limit(1)
+    const user = existing?.[0]
+    if (!user) return redirect('/forgot-password?error=not-registered')
 
-        // Look up user; if not found, exit generically
-        const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1)
-        const user = existing?.[0]
-        if (!user) return redirect('/forgot-password?error=not-registered')
+    // Create and store token
+    const token = randomUUID()
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 30)
+    await db.insert(verifications).values({ identifier: email, value: token, expiresAt })
 
-        // Create a reset token (stored hash/value depending on how verification is used)
-        const token = randomUUID()
-        const expiresAt = new Date(Date.now() + 1000 * 60 * 30) // 30 minutes
+    // Build reset link
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const resetUrl = `${baseUrl}/reset-password?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`
 
-        // Store token in verifications table
-        await db.insert(verifications).values({
-            identifier: email,
-            value: token,
-            expiresAt,
-        })
-
-        // Build reset link
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-        const resetUrl = `${baseUrl}/reset-password?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`
-
-        // Send email via SMTP if configured; otherwise fall back to Ethereal
+    // Try sending via SMTP; if fails, fall back to Ethereal
+    try {
         if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-            try {
-                const transporter = nodemailer.createTransport({
-                    host: process.env.SMTP_HOST,
-                    port: Number(process.env.SMTP_PORT || 587),
-                    secure: Boolean(process.env.SMTP_SECURE === 'true'),
-                    auth: {
-                        user: process.env.SMTP_USER,
-                        pass: process.env.SMTP_PASS,
-                    },
-                })
-
-                await transporter.sendMail({
-                    from: process.env.MAIL_FROM || process.env.SMTP_USER,
-                    to: email,
-                    subject: 'Reset your password',
-                    html: `<p>Click the link below to reset your password (valid for 30 minutes):</p>
+            const transporter = nodemailer.createTransport({
+                host: process.env.SMTP_HOST,
+                port: Number(process.env.SMTP_PORT || 587),
+                secure: Boolean(process.env.SMTP_SECURE === 'true'),
+                auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+            })
+            await transporter.sendMail({
+                from: process.env.MAIL_FROM || process.env.SMTP_USER,
+                to: email,
+                subject: 'Reset your password',
+                html: `<p>Click the link below to reset your password (valid for 30 minutes):</p>
 <p><a href="${resetUrl}">${resetUrl}</a></p>`,
-                })
-            } catch (sendErr) {
-                console.error('SMTP send failed, falling back to Ethereal:', sendErr)
-                const testAccount = await nodemailer.createTestAccount()
-                const transporter = nodemailer.createTransport({
-                    host: 'smtp.ethereal.email',
-                    port: 587,
-                    secure: false,
-                    auth: {
-                        user: testAccount.user,
-                        pass: testAccount.pass,
-                    },
-                })
-                const info = await transporter.sendMail({
-                    from: 'no-reply@example.com',
-                    to: email,
-                    subject: 'Reset your password',
-                    html: `<p>Click the link below to reset your password (valid for 30 minutes):</p>
-<p><a href="${resetUrl}">${resetUrl}</a></p>`,
-                })
-                console.log('Ethereal preview URL:', (nodemailer as any).getTestMessageUrl?.(info))
-            }
+            })
         } else {
-            // Fallback to Ethereal test account for local dev
+            throw new Error('SMTP not configured')
+        }
+    } catch (sendErr) {
+        try {
             const testAccount = await nodemailer.createTestAccount()
             const transporter = nodemailer.createTransport({
                 host: 'smtp.ethereal.email',
                 port: 587,
                 secure: false,
-                auth: {
-                    user: testAccount.user,
-                    pass: testAccount.pass,
-                },
+                auth: { user: testAccount.user, pass: testAccount.pass },
             })
             const info = await transporter.sendMail({
                 from: 'no-reply@example.com',
@@ -217,15 +192,13 @@ export async function requestPasswordReset(formData: FormData) {
 <p><a href="${resetUrl}">${resetUrl}</a></p>`,
             })
             console.log('Ethereal preview URL:', (nodemailer as any).getTestMessageUrl?.(info))
+        } catch (etherealErr) {
+            console.error('Both SMTP and Ethereal failed:', etherealErr)
         }
-
-        return redirect('/forgot-password?sent=1')
-    } catch (error) {
-        if (error instanceof z.ZodError) {
-            return redirect('/forgot-password?error=invalid-input')
-        }
-        return redirect('/forgot-password?error=server')
     }
+
+    // Important: call redirect outside try/catch so Next.js can handle it
+    return redirect('/forgot-password?sent=1')
 }
 
 const resetSchema = z.object({
