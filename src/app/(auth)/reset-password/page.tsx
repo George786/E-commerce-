@@ -1,7 +1,7 @@
 import { resetPassword } from '@/lib/auth/actions'
 
 type Props = {
-    searchParams?: { [key: string]: string | string[] | undefined }
+    searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 function ResetForm({ token, email }: { token: string; email: string }) {
@@ -45,9 +45,12 @@ function ResetForm({ token, email }: { token: string; email: string }) {
     )
 }
 
-export default function Page({ searchParams }: Props) {
-    const token = (searchParams?.token as string) || ''
-    const email = (searchParams?.email as string) || ''
+export default async function Page({ searchParams }: Props) {
+    const params = (await searchParams) || {}
+    const tokenRaw = params.token
+    const emailRaw = params.email
+    const token = Array.isArray(tokenRaw) ? tokenRaw[0] : tokenRaw || ''
+    const email = Array.isArray(emailRaw) ? emailRaw[0] : emailRaw || ''
     return <ResetForm token={token} email={email} />
 }
 

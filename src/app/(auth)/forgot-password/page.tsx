@@ -1,7 +1,7 @@
 import { requestPasswordReset } from '@/lib/auth/actions'
 
 type Props = {
-    searchParams?: { [key: string]: string | string[] | undefined }
+    searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export const dynamic = 'force-dynamic'
@@ -46,8 +46,10 @@ function FormInner({ sent }: { sent: boolean }) {
     )
 }
 
-export default function Page({ searchParams }: Props) {
-    const sent = searchParams?.sent === '1'
+export default async function Page({ searchParams }: Props) {
+    const params = (await searchParams) || {}
+    const raw = params.sent
+    const sent = Array.isArray(raw) ? raw[0] === '1' : raw === '1'
     return <FormInner sent={Boolean(sent)} />
 }
 
