@@ -1,5 +1,5 @@
 "use client";
-
+// Implementing Footer component
 import Image from "next/image";
 import Link from "next/link";
 import FooterRegion from "./footer-region";
